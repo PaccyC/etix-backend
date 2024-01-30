@@ -35,7 +35,19 @@ const userSchema= new mongoose.Schema({
     },
     img:{
         type:String
-    }
+    },
+    otp_enabled:{
+        type:Boolean,
+        default:false
+    },
+    otp_verified:{
+        type:Boolean,
+        default:false
+    }, 
+    otp_ascii: { type: String },
+    otp_hex: { type: String },
+    otp_base32: { type: String },
+    otp_auth_url: { type: String },
 
 },
 {timestamps:true}

@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt=require("bcrypt")
 const User = require("../models/userModel")
 const dotenv =require("dotenv")
+const crypto = require("crypto")
+const {encode}= require("hi-base32")
+const OTPAuth = require("otpauth")
 dotenv.config();
 const creatToken= async(_id)=>{
  return jwt.sign({_id:_id},process.env.SECRET_KEY,{expiresIn:"2d"})
@@ -36,6 +39,7 @@ const newUser= await User.create({
  
 await newUser.save();
 
+
 const token= await creatToken(newUser._id)
 return res.json({user:newUser, token}).status(200)
 } catch (error) {
@@ -67,7 +71,8 @@ const login= async (req,res)=>{
         }
        
         const token= await creatToken(user._id)
-        return res.json({user:user, token}).status(200)
+       
+        return res.json({user:user,otp_enabled:user.otp_enabled, token}).status(200)
     }
     catch(err){
         console.log(err)
@@ -89,9 +94,54 @@ const updateUser= async (req,res)=>{
 }
 
 
+// To generate the base32 encoded secret key
+const generateRandomBase32 = () => {
+    const buffer = crypto.randomBytes(15);
+
+    const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
+    return base32;
+};
+
+
+const genetateOTP = async (req,res)=>{
+try{
+const {user_id}=req.body;
+const user= await User.findById(user_id)
+if(!user){
+    return res.json({message:"User not found"})
+              .status(400)
+}
+const base32_secret= generateRandomBase32();
+let totp= new OTPAuth.TOTP({
+    issuer:"codevoweb.com",
+    label:"CodevoWeb",
+    algorithm:"SHA1",
+    secret:base32_secret,
+})
+
+
+let otpauth_url=totp.toString();
+await User.findByIdAndUpdate(user_id,{
+    otp_auth_url:otpauth_url,
+    otp_base32:base32_secret,
+})
+res.status(200).json({
+    base32:base32_secret,
+    otpauth_url,
+})
+} 
+
+catch(err){
+res.status(500).json({
+    status:"error",
+    message:err.message
+});
+}
+} ;
 module.exports={
     register,
     login,
     getUsers,
-    updateUser
+    updateUser,
+    genetateOTP
 }
