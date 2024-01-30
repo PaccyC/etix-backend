@@ -137,11 +137,122 @@ res.status(500).json({
     message:err.message
 });
 }
-} ;
+};
+
+const verifyOTP= async(req,res)=>{
+    try {
+        const {user_id, token}= req.body;
+        const user = await User.findById(user_id)
+        if(!user){
+            return res.status(401).json({
+                status:"fail",
+                message:"Token is invalid or user does not exist"
+
+            })
+        }
+        let totp= new OTPAuth.TOTP({
+            issuer:"codevoweb.com",
+            label:"CodevoWeb",
+            algorithm:"SHA1",
+            digits:6,
+            secret:user.otp_base32,
+        })
+        let delta= totp.validate({token:token})
+
+        if(delta === null){
+        return res.status(401).json({
+            status:"fail",
+            message:"Token is invalid or user doesn't exist",
+        })
+        }
+        const updateUser= await User.findByIdAndUpdate(user_id,{
+            otp_enabled:true,
+            otp_verified:true
+        })
+        res.status(200).json({
+            otp_verified:true,
+            updateUser,
+            otp_enabled:updateUser.otp_enabled
+        })
+    } catch (error) {
+        res.status(500).json({
+            status:"error",
+            message:error.message
+        })
+    }
+
+}
+
+const validateOTP= async(req,res)=>{
+try {
+    const {user_id,token}=req.body;
+    const user= await User.findById(user_id);
+    const message= "Token is invalid or user doesn't exist"
+
+    if(!user){
+        return res.status(401).json({
+            status:"fail",
+            message
+        })
+    }
+    let totp= new OTPAuth.TOTP({
+        issuer:"codevoweb.com",
+        label:"CodevoWeb",
+        algorithm:"SHA1",
+        digits:6,
+        secret:user.otp_base32,
+    })
+    let delta= totp.validate({token,window:1})
+    if(delta === null){
+        return res.status(401).json({
+            status:"fail",
+            message,
+        })
+    }
+    res.status(200).json({
+        otp_valid:true
+    })
+
+} catch (error) {
+    res.status(500).json({
+        status:"error",
+        message:error.message
+    })
+}
+}
+// Disabling OTP features
+
+const disableOTP=async(req,res)=>{
+try {
+    const {user_id}=req.body;
+    const user= await User.findById(user_id);
+    if(!user){
+        return res.status(401).json({
+            status:"fail",
+            message:"User not found"
+        })
+    }
+    const updateUser= await User.findByIdAndUpdate(user_id,{
+        otp_enabled:false
+    })
+    res.status(200).json({
+        otp_disabled:true,
+        updateUser
+    })
+} catch (error) {
+    res.status(500).json({
+        status:"error",
+        message:error.message
+    })
+}
+}
 module.exports={
     register,
     login,
     getUsers,
     updateUser,
-    genetateOTP
+    genetateOTP,
+    verifyOTP,
+    validateOTP,
+    disableOTP
 }

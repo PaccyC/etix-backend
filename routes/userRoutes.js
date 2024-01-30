@@ -9,6 +9,11 @@ router.post("/signup",userController.register)
 
 router.post("/login",userController.login)
 router.post("/otp/generate",userController.genetateOTP)
+router.post("/otp/verify",userController.verifyOTP)
+router.post("/otp/validate",userController.validateOTP)
+router.post("/otp/disable",userController.disableOTP)
+
+
 
 
 module.exports=router;
