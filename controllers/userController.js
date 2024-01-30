@@ -182,6 +182,7 @@ const verifyOTP= async(req,res)=>{
     }
 
 }
+// Validating OTP
 
 const validateOTP= async(req,res)=>{
 try {
