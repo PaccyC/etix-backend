@@ -7,10 +7,11 @@ const creatToken= async(_id)=>{
  return jwt.sign({_id:_id},process.env.SECRET_KEY,{expiresIn:"2d"})
 }
 
-console.log(process.env.SECRET_KEY);
+
+
 const register= async (req,res)=>{
 
-const {firstName,lastName,username,email,password,img} =req.body;
+const {firstName,lastName,username,email,phoneNumber,password,img} =req.body;
 
 // check if user is already registered
 
@@ -28,6 +29,7 @@ const newUser= await User.create({
     lastName,
     username,
     email,
+    phoneNumber,
     password:hashedPassword,
     img
 })

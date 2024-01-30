@@ -16,13 +16,19 @@ const userSchema= new mongoose.Schema({
     },
     email:{
         type:String,
-        required:[true,"email is required!"]
+        // required:[true,"email is required!"],
+        unique:[true,"email already exists!"]
     },
     password:{
         type:String,
         required:[true,"password is required!"],
         min:[6,"Password must be at least 6 characters"]
     },
+    phoneNumber:{
+    type:String,
+    required:[true,"phoneNumber is required!"]
+    },
+
     isAdmin:{
         type:Boolean,
         default:false

@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv= require("dotenv");
 const mongoose= require("mongoose");
 const userRoutes= require("./routes/userRoutes")
-
+const busRoutes= require("./routes/busRoutes")
 
 
 const app= express();
@@ -15,6 +15,7 @@ const port =process.env.PORT;
 app.use(express.json())
 
 
+// Setting database connection
 mongoose.connect(process.env.DB_URI)
 .then(()=>{
     app.listen(process.env.PORT,()=>{
@@ -27,3 +28,6 @@ mongoose.connect(process.env.DB_URI)
 .catch(err => console.log(err))
 
 app.use("/api/user",userRoutes)
+
+
+app.use("/api/bus",busRoutes)
