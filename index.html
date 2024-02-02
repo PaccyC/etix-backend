@@ -6,13 +6,52 @@
     <title>Document</title>
 </head>
 <body>
-    <div class="map">
-  Hello TomTom map
-    </div>
-    
+    <div id="map"></div>
+    <div id="details"></div>
+
     <script>
+        // Getting current Pasition
+
+        navigator.geolocation.getCurrentPosition(position => {
+            const { latitude, longitude } = position.coords;
+            console.log(latitude, longitude);
+            console.log(position.coords);
+
+            // Show a map centered at latitude / longitude.
+            document.getElementById('map').innerHTML = '<iframe width="700" height="300" src="https://maps.google.com/maps?q=' + latitude + ',' + longitude + '&amp;z=15&amp;output=embed"></iframe>';
+        });
+
+
+        // Getting updates about the location
+
+        navigator.geolocation.watchPosition(successCallback,errorCallback,options);
         
-        let API_KEY="4A6P11UHrub0AIcR1hkN6DugebWnmTTZ"
+        function successCallback(position){
+            const {accuracy,latitude,longitude,altitude,heading,speed}= position.coords;
+            let reqcount=0;
+
+            const details = document.getElementById('details');
+            details.innerHTML="Accuracy: " + accuracy+ "<br>";
+            details.innerHTML+="Latitude: " + latitude+"| Longitude: " +longitude+ "<br>";
+            details.innerHTML+="Altitude: " + altitude+ "<br>";
+            details.innerHTML+="Heading: " + heading+ "<br>";
+            details.innerHTML+="Speed: " + speed+ "<br>";
+            details.innerHTML +="reqcount: "+reqcount;
+
+
+   }
+   function errorCallback(){
+
+   }
+   var options={
+enableHighAccuracy:false,
+timeout:5000,
+maximumAge:0
+   }
+   
+
+
     </script>
+
 </body>
 </html>

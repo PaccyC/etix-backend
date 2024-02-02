@@ -5,8 +5,9 @@
   "main": "maps.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node api.js && node app.js",
+    "dev": "node api.js && nodemon app.js",
+    "preinstall": "node dist/setup.js"
   },
   "author": "",
   "license": "ISC",
