@@ -157,7 +157,11 @@ const verifyOTP= async(req,res)=>{
             digits:6,
             secret:user.otp_base32,
         })
-        let delta= totp.validate({token:token})
+        let delta= totp.validate({token:token,window:3})
+
+        console.log("User OTP Base32:", user.otp_base32);
+        console.log("Received Token:", token);
+         console.log("Delta:", delta);
 
         if(delta === null){
         return res.status(401).json({
@@ -174,6 +178,7 @@ const verifyOTP= async(req,res)=>{
             updateUser,
             otp_enabled:updateUser.otp_enabled
         })
+  
     } catch (error) {
         res.status(500).json({
             status:"error",
@@ -182,6 +187,7 @@ const verifyOTP= async(req,res)=>{
     }
 
 }
+
 // Validating OTP
 
 const validateOTP= async(req,res)=>{
@@ -203,7 +209,8 @@ try {
         digits:6,
         secret:user.otp_base32,
     })
-    let delta= totp.validate({token,window:1})
+   
+    let delta= totp.validate({token,window:3})
     if(delta === null){
         return res.status(401).json({
             status:"fail",
@@ -213,6 +220,9 @@ try {
     res.status(200).json({
         otp_valid:true
     })
+    console.log("User OTP Base32:", user.otp_base32);
+console.log("Received Token:", token);
+console.log("Delta:", delta);
 
 } catch (error) {
     res.status(500).json({
